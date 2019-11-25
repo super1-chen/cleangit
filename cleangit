@@ -1,0 +1,23 @@
+#!/bin/bash
+
+current_dir=$(pwd)
+git rev-parse --git-dir >/dev/null 2>&1 
+
+if [ "$?" = "0" ]; then
+    git clean -fd
+    git checkout .
+    echo "clean uncommitted git in repo $current_dir ok"
+    if [[ "$@" != '' ]]; then
+        git reset --hard "$@"
+    fi
+    git fetch
+    head=$(git branch | grep \* | cut -d ' ' -f2)
+#    echo $head
+    echo "your brech $head head is: "
+    git reset --hard "origin/$head"
+    git log -n1 --pretty=oneline | awk '{print}'
+else
+    echo "no .git repo in $current_dir, exit."
+fi
+exit 0
+
